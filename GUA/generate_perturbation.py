@@ -184,7 +184,7 @@ def proj_lp(v, xi=args.radius, p=2):
 #     print ('the distance of v', np.linalg.norm(v.flatten(1)))
     
     if p == 2:
-        v = v * min(1, xi/np.linalg.norm(v.flatten(1)))
+        v = v * min(1, xi/np.linalg.norm(v.flatten(order='C')))
         # v = v / np.linalg.norm(v.flatten(1)) * xi
     elif p == np.inf:
         v = np.sign(v) * np.minimum(abs(v), xi)
@@ -236,7 +236,7 @@ def deepfool(innormal_adj, ori_adj, idx, num_classes, degree, overshoot=0.02, ma
     I = I[0:num_classes]
     label = I[0]
     
-    f_i = np.array(pred).flatten()
+    f_i = np.array(pred).flatten(order='C')
 
     k_i = int(np.argmax(f_i))
     
@@ -256,7 +256,7 @@ def deepfool(innormal_adj, ori_adj, idx, num_classes, degree, overshoot=0.02, ma
             # set new w_k and new f_k
             w_k = gradients[i, :] - gradients[0, :]
             f_k = f_i[I[i]] - f_i[I[0]]
-            pert_k = abs(f_k)/np.linalg.norm(w_k.flatten())
+            pert_k = abs(f_k)/np.linalg.norm(w_k.flatten(order='C'))
 #             print ('num_classes', num_classes)
 #             print ('pert_k', pert_k)
 #             print ('w_k', w_k)
@@ -296,7 +296,7 @@ def deepfool(innormal_adj, ori_adj, idx, num_classes, degree, overshoot=0.02, ma
         # compute new label
         pert_adj_tensor = torch.from_numpy(pert_adj.astype(np.float32))
         pert_adj_tensor = pert_adj_tensor.cuda()
-        f_i = np.array(model(features, pert_adj_tensor)[idx].detach().cpu().numpy()).flatten()
+        f_i = np.array(model(features, pert_adj_tensor)[idx].detach().cpu().numpy()).flatten(order='C')
         k_i = int(np.argmax(f_i))
 #         print ('degree', degree[idx])
 #         print ('original conn', ori_adj[idx])
